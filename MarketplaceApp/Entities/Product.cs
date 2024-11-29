@@ -14,26 +14,32 @@ namespace MarketplaceApp.Data.Entities
         public string Description { get; set; }
         public decimal Price { get; set; }
 
+        public Guid SellerId { get; set; }
+
         public ProductStatusEnum Status { get; set; }
 
+        public Guid CategoryId { get; set; }
+
         // Kreiranje vec postojeceg produkt unutar aplikacije
-        public Product(string name, string description, decimal price, ProductStatusEnum status) 
+        public Product(string name, string description, decimal price, ProductStatusEnum status, Guid categoryId) 
         {
             Id = Guid.NewGuid();
             Name = name;
             Description = description;
             Price = price;
             Status = status;
+            CategoryId = categoryId;
         }
 
         // Dodavanje produkta koristenjem aplikacije
-        public Product(string name, string description, decimal price)
+        public Product(string name, string description, decimal price, Guid categoryId)
         {
             Id = Guid.NewGuid();
             Name = name;
             Description = description;
             Price = price;
             Status = ProductStatusEnum.OnSale;
+            CategoryId = categoryId;
         }
     }
 }

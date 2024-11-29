@@ -3,37 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MarketplaceApp.Data.Entities
 {
     public class Transaction
     {
-        Guid Id { get; }
-        Guid ProductId { get; set; }
+        public Guid Id { get; }
+        public Guid ProductId { get; set; }
 
-        Guid BuyerId { get; set; }
-        Guid SellerId { get; set; }
-        DateTime Date {  get; set; }
+        public Guid BuyerId { get; set; }
+        public Guid SellerId { get; set; }
+        public DateTime Date { get; set; }
+
+        public decimal Amount { get; set; }
 
         // Kreira vec postojecu transakciju unutar aplikacije
-        public Transaction(Guid productId, Guid buyerId, Guid sellerId, DateTime date)
+        public Transaction(Guid productId, Guid buyerId, Guid sellerId, DateTime date, decimal amount)
         {
             Id = Guid.NewGuid();
             ProductId = productId;
             BuyerId = buyerId;
             SellerId = sellerId;
             Date = date;
+            Amount = amount;
         }
 
         // Dodavanje transakcije koristenjem aplikacije
-        public Transaction(Guid productId, Guid buyerId, Guid sellerId) 
+        public Transaction(Guid productId, Guid buyerId, Guid sellerId, decimal amount)
         {
             Id = Guid.NewGuid();
             ProductId = productId;
             BuyerId = buyerId;
             SellerId = sellerId;
             Date = DateTime.Now;
+            Amount = amount;
         }
     }
 }
+
