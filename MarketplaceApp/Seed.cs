@@ -40,19 +40,19 @@ namespace MarketplaceApp.Data
             new Product("Ženska haljina", "Lagana haljina idealna za ljeto.", 29.99m, ProductStatusEnum.Sold, Categories[1].Id), // 5
 
             // Produkti za kategoriju Knjige
-            new Product("Harry Potter i Kamen mudraca", "Prva knjiga iz serijala o Harryju Potteru, mladom čarobnjaku.", 19.99m, ProductStatusEnum.Sold, Categories[3].Id), // 6
-            new Product("1984", "Dystopijski roman Georgea Orwella koji opisuje totalitarni režim.", 14.99m, ProductStatusEnum.OnSale, Categories[3].Id), // 7
-            new Product("Ubiti pticu rugalicu", "Klasik Harper Lee koji istražuje rasizam i pravdu u malom američkom gradu.", 12.99m, ProductStatusEnum.OnSale, Categories[3].Id), // 8
+            new Product("Harry Potter i Kamen mudraca", "Prva knjiga iz serijala o Harryju Potteru, mladom čarobnjaku.", 19.99m, ProductStatusEnum.Sold, Categories[2].Id), // 6
+            new Product("1984", "Dystopijski roman Georgea Orwella koji opisuje totalitarni režim.", 14.99m, ProductStatusEnum.OnSale, Categories[2].Id), // 7
+            new Product("Ubiti pticu rugalicu", "Klasik Harper Lee koji istražuje rasizam i pravdu u malom američkom gradu.", 12.99m, ProductStatusEnum.OnSale, Categories[2].Id), // 8
 
             // Produkti za kategoriju Hrana i pice
-            new Product("Čokolada", "Tamna čokolada sa 70% kakaa, bogat okus i visoka kvaliteta.", 2.49m, ProductStatusEnum.OnSale, Categories[4].Id), // 9
-            new Product("Jabuke", "Svježe i sočne jabuke, odlične za užinu.", 1.99m, ProductStatusEnum.OnSale, Categories[4].Id), // 10
-            new Product("Kava", "Svježe mljevena kava s bogatim i aromatičnim okusom.", 4.99m, ProductStatusEnum.Sold, Categories[4].Id), // 11
+            new Product("Čokolada", "Tamna čokolada sa 70% kakaa, bogat okus i visoka kvaliteta.", 2.49m, ProductStatusEnum.OnSale, Categories[3].Id), // 9
+            new Product("Jabuke", "Svježe i sočne jabuke, odlične za užinu.", 1.99m, ProductStatusEnum.OnSale, Categories[3].Id), // 10
+            new Product("Kava", "Svježe mljevena kava s bogatim i aromatičnim okusom.", 4.99m, ProductStatusEnum.Sold, Categories[3].Id), // 11
 
             // Produkti za kategoriju Namjestaj
-            new Product("Kauč", "Udoban trosjed sa modernim dizajnom, pogodan za dnevni boravak.", 299.99m, ProductStatusEnum.Sold, Categories[2].Id), // 12
-            new Product("Stol za dnevni boravak", "Elegantni drveni stol za dnevni boravak s prostorom za pohranu.", 199.99m, ProductStatusEnum.OnSale, Categories[2].Id), // 13
-            new Product("Komoda", "Komoda s 6 ladica, idealna za pohranu odjeće ili drugih predmeta.", 149.99m, ProductStatusEnum.OnSale, Categories[2].Id) // 14
+            new Product("Kauč", "Udoban trosjed sa modernim dizajnom, pogodan za dnevni boravak.", 299.99m, ProductStatusEnum.Sold, Categories[4].Id), // 12
+            new Product("Stol za dnevni boravak", "Elegantni drveni stol za dnevni boravak s prostorom za pohranu.", 199.99m, ProductStatusEnum.OnSale, Categories[4].Id), // 13
+            new Product("Komoda", "Komoda s 6 ladica, idealna za pohranu odjeće ili drugih predmeta.", 149.99m, ProductStatusEnum.OnSale, Categories[4].Id) // 14
         };
         
         public static readonly List<User> Users = new List<User>()
@@ -63,7 +63,7 @@ namespace MarketplaceApp.Data
             new Buyer("Ivana", "ivana@gmail.com", 300.00m, new List<Guid> { Products[6].Id, Products[11].Id, Products[12].Id }, new List<Guid> { Products[13].Id, Products[14].Id }), // 2
 
             // Prodavaci
-            new Seller("Petar", "petar@gmail.com", new List<Guid> { Products[12].Id, Products[0].Id, Products[4].Id }, 319.98m), // 3
+            new Seller("Ivo", "ivo@gmail.com", new List<Guid> { Products[12].Id, Products[0].Id, Products[4].Id }, 319.98m), // 3
             new Seller("Jelena", "jelena@gmail.com", new List<Guid> { Products[1].Id, Products[3].Id, Products[5].Id, Products[7].Id }, 499.99m + 29.99m), // 4
             new Seller("Mirko", "mirko@gmail.com", new List<Guid> { Products[2].Id, Products[6].Id, Products[8].Id, Products[9].Id }, 19.99m), // 5
             new Seller("Stipe", "stipe@gmail.com", new List<Guid> { Products[10].Id, Products[11].Id, Products[13].Id, Products[14].Id }, 4.99m), // 6

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace MarketplaceApp.Domain.Repositories
 {
@@ -29,7 +30,12 @@ namespace MarketplaceApp.Domain.Repositories
 
         public User GetUser(string name, string email)
         {
-            return _marketplaceContext.Users.FirstOrDefault(user => user.Name == name && user.Email == email);
+            return _marketplaceContext.Users.FirstOrDefault(user => user.Name.ToLower() == name.ToLower() && user.Email == email);
+        }
+
+        public User GetUser(string email)
+        {
+            return _marketplaceContext.Users.FirstOrDefault(user => user.Email == email);
         }
 
         public IEnumerable<User> GetAll()

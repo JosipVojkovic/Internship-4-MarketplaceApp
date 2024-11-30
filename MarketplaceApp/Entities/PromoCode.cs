@@ -18,6 +18,7 @@ namespace MarketplaceApp.Data.Entities
             Id = Guid.NewGuid();
             Code = code;
             DiscountPercentage = discountPercentage;
+            ExpirationDate = expirationDate;
         }
         
     }

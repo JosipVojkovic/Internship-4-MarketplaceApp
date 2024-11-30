@@ -14,8 +14,6 @@ namespace MarketplaceApp.Data.Entities
         public string Description { get; set; }
         public decimal Price { get; set; }
 
-        public Guid SellerId { get; set; }
-
         public ProductStatusEnum Status { get; set; }
 
         public Guid CategoryId { get; set; }

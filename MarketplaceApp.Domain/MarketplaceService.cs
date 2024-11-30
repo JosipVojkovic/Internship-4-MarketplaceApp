@@ -27,18 +27,29 @@ namespace MarketplaceApp.Domain
             _promoCodeRepository = promoCodeRepository;
         }
 
-        public void RegisterBuyer(string name, string email, decimal balance)
+        public bool RegisterBuyer(string name, string email, decimal balance)
         {
-            var buyer = new Buyer(name, email, balance);
+            if(_userRepository.GetUser(email) != null)
+            {
+                return false;
+            }
 
+            var buyer = new Buyer(name, email, balance);
             _userRepository.Add(buyer);
+            return true;
         }
 
-        public void RegisterSeller(string name, string email)
+        public bool RegisterSeller(string name, string email)
         {
+            if (_userRepository.GetUser(email) != null)
+            {
+                return false;
+            }
+
             var seller = new Seller(name, email);
 
             _userRepository.Add(seller);
+            return true;
         }
 
         public User LoginUser(string name, string email)
@@ -61,23 +72,24 @@ namespace MarketplaceApp.Domain
 
             if (product == null || product.Status != ProductStatusEnum.OnSale)
             {
-                Console.WriteLine("Produkt nije dostupan za prodaju.");
+                Console.WriteLine("Proizvod nije dostupan za prodaju.\n");
                 return;
             }
 
             if (buyer.Balance < product.Price)
             {
-                Console.WriteLine("Nemate dovoljno sredstava na vasem racunu.");
+                Console.WriteLine("Nemate dovoljno sredstava na vasem racunu.\n");
                 return;
             }
 
             buyer.Balance -= amount;
             product.Status = ProductStatusEnum.Sold;
+            buyer.PurchasedProducts.Add(product.Id);
 
-            var transaction = new Transaction(product.Id, buyer.Id, seller.Id, amount);
+            var transaction = new Transaction(product.Id, buyer.Id, seller.Id, -amount);
             _transactionRepository.Add(transaction);
 
-            Console.WriteLine($"Produkt {product.Name} uspjesno kupljen.");
+            Console.WriteLine($"Proizvod {product.Name} uspjesno kupljen.\n");
         }
 
         public void BuyProduct(Guid buyerId, Guid productId, Guid promoCodeId)
@@ -96,23 +108,25 @@ namespace MarketplaceApp.Domain
 
             if (product == null || product.Status != ProductStatusEnum.OnSale)
             {
-                Console.WriteLine("Produkt nije dostupan za prodaju.");
+                Console.WriteLine("Proizvod nije dostupan za prodaju.\n");
                 return;
             }
 
             if (buyer.Balance < product.Price)
             {
-                Console.WriteLine("Nemate dovoljno sredstava na vasem racunu.");
+                Console.WriteLine("Nemate dovoljno sredstava na vasem racunu.\n");
                 return;
             }
 
             buyer.Balance -= amount;
             product.Status = ProductStatusEnum.Sold;
+            buyer.PurchasedProducts.Add(product.Id);
 
-            var transaction = new Transaction(product.Id, buyer.Id, seller.Id, amount);
+            var transaction = new Transaction(product.Id, buyer.Id, seller.Id, -amount);
             _transactionRepository.Add(transaction);
+            
 
-            Console.WriteLine($"Produkt {product.Name} uspjesno kupljen.");
+            Console.WriteLine($"Proizvod {product.Name} uspjesno kupljen.\n");
         }
 
         public void ReturnProduct(Guid buyerId, Guid productId)
@@ -123,19 +137,20 @@ namespace MarketplaceApp.Domain
 
             if (product == null || product.Status != ProductStatusEnum.Sold || !buyer.PurchasedProducts.Contains(productId))
             {
-                Console.WriteLine("Produkt nije kupljen ili je vec vracen.");
+                Console.WriteLine("Proizvod nije kupljen ili je vec vracen.\n");
                 return;
             }
 
-            decimal refundAmount = product.Price * 0.80m;
+            decimal refundAmount = Math.Round(product.Price * 0.80m, 2);
             buyer.Balance += refundAmount;
-            seller.TotalEarnings -= product.Price * 0.85m;
+            seller.TotalEarnings -= Math.Round(product.Price * 0.85m, 2);
             product.Status = ProductStatusEnum.OnSale;
+            buyer.PurchasedProducts.Remove(product.Id);
 
             var returnTransaction = new Transaction(product.Id, buyer.Id, seller.Id, 80);
             _transactionRepository.Add(returnTransaction);
 
-            Console.WriteLine($"produkt {product.Name} uspjesno vracen. Povrat: {refundAmount} EUR.");
+            Console.WriteLine($"Proizvod {product.Name} uspjesno vracen. Povrat: {refundAmount} EUR.\n");
         }
 
         public void AddProductToFavourites(Guid buyerId, Guid productId)
@@ -145,12 +160,12 @@ namespace MarketplaceApp.Domain
 
             if (product == null || product.Status != ProductStatusEnum.OnSale)
             {
-                Console.WriteLine("Produkt nije dostupan.");
+                Console.WriteLine("Proizvod nije dostupan.");
                 return;
             }
 
             buyer.FavouriteProducts.Add(product.Id);
-            Console.WriteLine($"Produkt {product.Name} dodan u favorite.");
+            Console.WriteLine($"Proizvod {product.Name} dodan u favorite.\n");
         }
 
         public List<Product> GetPurchasedProducts(Guid buyerId)
@@ -161,6 +176,11 @@ namespace MarketplaceApp.Domain
             var purchasedProducts = products.Where(product => buyer.PurchasedProducts.Contains(product.Id)).ToList();
 
             return purchasedProducts;
+        }
+
+        public List<Transaction> GetBuyerTransactions(Guid buyerId)
+        {
+            return _transactionRepository.GetByUser(buyerId);
         }
 
         public List<Product> GetFavouriteProducts(Guid buyerId)
@@ -177,7 +197,7 @@ namespace MarketplaceApp.Domain
 
             if (category == null)
             {
-                Console.WriteLine("Kategorija nije pronadena.");
+                Console.WriteLine("Kategorija nije pronadena.\n");
                 return;
             }
 
@@ -187,12 +207,15 @@ namespace MarketplaceApp.Domain
             seller.OwnedProducts.Add(product.Id);
             _productRepository.AddProduct(product);
 
-            Console.WriteLine($"Produkt {name} dodan na prodaju.");
+            Console.WriteLine($"Proizvod {name} dodan na prodaju.\n");
         }
 
         public List<Product> GetSellerProducts(Guid sellerId)
         {
-            return _productRepository.GetAllProducts().Where(p => p.Id == sellerId).ToList();
+            var seller = _userRepository.GetById(sellerId) as Seller;
+            var products = _productRepository.GetAllProducts().Where(p => seller.OwnedProducts.Contains(p.Id)).ToList();
+
+            return products;
         }
 
         public decimal GetTotalSaleEarnings(Guid sellerId)
@@ -211,23 +234,35 @@ namespace MarketplaceApp.Domain
                 return new List<Product>();
             }
 
-            var soldProducts = _productRepository.GetAllProducts().Where(p => p.Id == sellerId && p.Status == ProductStatusEnum.Sold && p.CategoryId == categoryId).ToList();
+            var soldProducts = GetSellerProducts(sellerId).FindAll(p => p.Status == ProductStatusEnum.Sold && p.CategoryId == categoryId);
             return soldProducts;
         }
 
-        public decimal GetTotalEarningsByDate(Guid sellerId, DateTime date)
+        public decimal GetTotalEarningsByDate(Guid sellerId, DateTime startDate, DateTime endDate)
         {
             var filteredTransactions = _transactionRepository.GetByUser(sellerId);
             var totalEarnings = 0m;
 
             foreach (var transaction in filteredTransactions)
             {
-                if (transaction.Date < date)
+                if (transaction.Date > startDate && transaction.Date < endDate)
                 {
-                    totalEarnings += -transaction.Amount * - 5 * (-transaction.Amount / 100);
+                    totalEarnings += transaction.Amount * - 5 * (transaction.Amount / 100);
                 }
             }
-            return totalEarnings;
+            return Math.Round(Math.Abs(totalEarnings), 2);
+        }
+
+        public List<PromoCode> GetPromoCodes(Guid productId)
+        {
+            var productCategoryId = _productRepository.GetProductById(productId).CategoryId;
+            var promoCodes = _categoryRepository.GetById(productCategoryId).PromoCodes;
+            return promoCodes;
+        }
+
+        public List<Category> GetCategories()
+        {
+            return _categoryRepository.GetAll().ToList();
         }
     }
 }
